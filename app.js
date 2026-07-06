@@ -129,7 +129,7 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: ["http://localhost:5173", "https://reel-nest-frontend.vercel.app/"],
     credentials: true, // Allows the backend to receive/send cookies
   }),
 );
