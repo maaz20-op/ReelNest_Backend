@@ -9,14 +9,14 @@ function sendAccessAndRefreshTokenThroughCookies(userEmail, res) {
   res.cookie("accessToken", accessToken, {
     httpOnly: true, // prevent JS access to cookie (secure) (csrf attxk saved)
     secure: false, // only HTTPS in productioin
-    sameSite: "None", // or "Strict" to prevent csrf attack it may not send cookie from unauthorized website
+    sameSite: "none", // or "Strict" to prevent csrf attack it may not send cookie from unauthorized website
     maxAge: 15 * 60 * 1000, // 15 min cookie age to live in browser
   });
 
   res.cookie("refreshToken", refreshToken, {
     httpOnly: true, // prevent JS access to cookie (secure)
     secure: false, // only HTTPS in prod
-    sameSite: "None", // or "Strict" / "None" based on frontend-backend location
+    sameSite: "none", // or "Strict" / "None" based on frontend-backend location
     maxAge: 24 * 60 * 60 * 1000 * 5, // 5 day in ms
   });
 }
