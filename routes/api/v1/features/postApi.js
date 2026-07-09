@@ -12,7 +12,8 @@ const {
   deletePost,
   imagesFetchingFeedPage,
   videosFetchingFeedPage,
-  getPostsByUserId,
+  getVideoPostsByUserId,
+  getImagePostsByUserId,
 } = require("../../../../controller/app/post");
 const apiRouteResFormate = require("../../../../utils/ApiRoute");
 const { ApolloServer } = require("@apollo/server");
@@ -102,6 +103,8 @@ router.delete("/:id", isLoggedIn, apiRouteResFormate(deletePost));
 
 router.get("/", apiRouteResFormate(searchPosts));
 
-router.get("/:id", apiRouteResFormate(getPostsByUserId));
+router.get("/video/:id", apiRouteResFormate(getVideoPostsByUserId));
+
+router.get("/image/:id", apiRouteResFormate(getImagePostsByUserId));
 
 module.exports = router;

@@ -277,7 +277,7 @@ module.exports.videosFetchingFeedPage = async function (req, res) {
   }
 };
 
-module.exports.getPostsByUserId = async function (req, res) {
+module.exports.getVideoPostsByUserId = async function (req, res) {
   try {
     const userId = req.params.id;
     if (!userId) throw new Error("invalid information");
@@ -286,6 +286,25 @@ module.exports.getPostsByUserId = async function (req, res) {
       .find({
         user: userId,
         mediaType: "video",
+      })
+      .sort({ createdAt: -1 });
+
+    console.log(posts);
+    return [posts];
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getImagePostsByUserId = async function (req, res) {
+  try {
+    const userId = req.params.id;
+    if (!userId) throw new Error("invalid information");
+
+    const posts = await postModel
+      .find({
+        user: userId,
+        mediaType: "image",
       })
       .sort({ createdAt: -1 });
 
