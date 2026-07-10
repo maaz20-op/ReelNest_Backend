@@ -140,7 +140,7 @@ module.exports.searchPosts = async function (req) {
   }
 };
 
-module.exports.imagesFetchingFeedPage = async function (req, res) {
+module.exports.imagesFetchingFeedPage = async function (req) {
   try {
     const page = Number(req.query.page) || 1;
     const limit = 4;
@@ -181,7 +181,7 @@ module.exports.imagesFetchingFeedPage = async function (req, res) {
   }
 };
 
-module.exports.videosFetchingFeedPage = async function (req, res) {
+module.exports.videosFetchingFeedPage = async function (req) {
   try {
     const page = Number(req.query.page) || 2;
     const limit = 4;
@@ -277,7 +277,7 @@ module.exports.videosFetchingFeedPage = async function (req, res) {
   }
 };
 
-module.exports.getVideoPostsByUserId = async function (req, res) {
+module.exports.getVideoPostsByUserId = async function (req) {
   try {
     const userId = req.params.id;
     if (!userId) throw new Error("invalid information");
@@ -296,7 +296,7 @@ module.exports.getVideoPostsByUserId = async function (req, res) {
   }
 };
 
-module.exports.getImagePostsByUserId = async function (req, res) {
+module.exports.getImagePostsByUserId = async function (req) {
   try {
     const userId = req.params.id;
     if (!userId) throw new Error("invalid information");

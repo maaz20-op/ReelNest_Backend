@@ -8,17 +8,15 @@ const redis = require("../../config/redisClient");
 
 module.exports.editprofpic = async function (req) {
   try {
-    const user = await userModel.findOne({
-      email: req.user?.email,
-    });
+    const user = await userModel.findById(req?.user?._id);
     if (!user) {
       throw new Error("Failed to Upload Profile Image");
     }
 
-    user.profileImage = req.file.path;
+    user.profileImage = req?.file?.path;
     await user.save();
 
-    return [user];
+    return [user?.profileImage];
   } catch (err) {
     throw err;
   }

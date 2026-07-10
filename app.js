@@ -38,6 +38,7 @@ const commentModel = require("./models/comment-model");
 require("./queues/emailQueue");
 
 const msgModel = require("./models/message-model");
+const pinModel = require("./models/pin-model");
 //userWatcherStreams()
 messageSocketsConnection(io);
 
@@ -150,7 +151,10 @@ app.use("/", require("./routes/web/index")); // use for web response, save fall 
 
 app.locals.moment = moment;
 
-app.get("/all", async function (req, res) {});
+app.get("/all", async function (req, res) {
+  const pin = await pinModel.find();
+  res.json(pin);
+});
 
 // app.use(globalErrorHandler)
 

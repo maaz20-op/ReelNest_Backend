@@ -1,21 +1,18 @@
 const mongoose = require("mongoose");
 
 const pinSchema = new mongoose.Schema({
-  image: {
-    type: String,
-  },
-  text: {
-    type: String,
-    maxlength: 300
+  savedPost: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Post",
   },
   createdAt: {
     type: Date,
-    default: Date.now
+    default: Date.now,
   },
   createdBy: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User"
-  }
+    ref: "User",
+  },
 });
 
 module.exports = mongoose.model("Pin", pinSchema);
