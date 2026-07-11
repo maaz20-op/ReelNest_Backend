@@ -11,6 +11,8 @@ const {
   unfollowOtherUser,
   followersList,
   getUserById,
+  getUserConnectionsById,
+  getLoggedInUserConnections,
 } = require("../../../../controller/app/user.js");
 const upload = require("../../../../config/multerConfig.js");
 const apiRouteResFormate = require("../../../../utils/ApiRoute");
@@ -19,7 +21,17 @@ const apiRouteResFormate = require("../../../../utils/ApiRoute");
 
 router.delete("/", isLoggedIn, apiRouteResFormate(deleteAccount));
 
-router.get("/followers", isLoggedIn, apiRouteResFormate(followersList));
+router.get(
+  "/connection/:id",
+  isLoggedIn,
+  apiRouteResFormate(getUserConnectionsById),
+);
+
+router.get(
+  "/connection",
+  isLoggedIn,
+  apiRouteResFormate(getLoggedInUserConnections),
+);
 
 router.patch("/block", isLoggedIn, apiRouteResFormate(blockOtherUser));
 

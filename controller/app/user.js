@@ -43,7 +43,7 @@ module.exports.updateAccountSettings = async function (req) {
       updatedData,
       { new: true },
     );
-
+    console.log(updatedUser);
     return [updatedUser];
   } catch (err) {
     throw err;
@@ -181,9 +181,117 @@ module.exports.unfollowOtherUser = async function (req) {
   }
 };
 
-module.exports.followersList = async function (req) {
+module.exports.getUserConnectionsById = async function (req) {
   try {
-    const userId = req?.user._id;
+    const userIdStr = req?.params?.id;
+
+    if (!userIdStr) throw Error("Not Valid Request");
+
+    const userId = new mongoose.Types.ObjectId(userIdStr);
+    const userfollowers = await userModel.aggregate([
+      {
+        $match: {
+          _id: userId,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "followers",
+          foreignField: "_id",
+          as: "data",
+        },
+      },
+      { $unwind: "$data" },
+      {
+        $match: {
+          $expr: {
+            $not: {
+              $in: ["$data._id", "$following"],
+            },
+          },
+        },
+      },
+
+      {
+        $project: {
+          "data._id": 1,
+          "data.fullname": 1,
+          "data.username": 1,
+          "data.profileImage": 1,
+        },
+      },
+    ]);
+
+    const userfollowing = await userModel.aggregate([
+      {
+        $match: {
+          _id: userId,
+        },
+      },
+      {
+        $lookup: {
+          from: "users",
+          localField: "following",
+          foreignField: "_id",
+          as: "data",
+        },
+      },
+      { $unwind: "$data" },
+      {
+        $match: {
+          $expr: {
+            $not: {
+              $in: ["$data._id", "$followers"],
+            },
+          },
+        },
+      },
+
+      {
+        $project: {
+          _id: 0,
+          _id: "$data._id",
+          fullname: "$data.fullname",
+          username: "$data.username",
+          profileImage: "$data.profileImage",
+        },
+      },
+    ]);
+    const user = await userModel
+      .findById(userId)
+      .populate("followers", "fullname")
+      .populate("following", "fullname");
+
+    const friendsIds =
+      user?.following?.filter((followingUser) => {
+        // Convert the current ID to a plain string
+        const followingIdStr =
+          followingUser._id?.toString() || String(followingUser);
+
+        // Check against stringified versions of the followers array
+        return user.followers.some((follower) => {
+          const followerIdStr = follower._id?.toString() || String(follower);
+          return followingIdStr === followerIdStr;
+        });
+      }) || [];
+
+    const friends = await userModel
+      .find({
+        _id: { $in: friendsIds },
+      })
+      .select("fullname username _id profileImage");
+
+    console.log(friends.length, userfollowers.length, userfollowing.length);
+    return [userfollowers, userfollowing, friends];
+  } catch (err) {
+    return null;
+  }
+};
+
+module.exports.getLoggedInUserConnections = async function (req) {
+  try {
+    const userId = req?.user?._id;
 
     if (!userId) throw Error("Not Valid Request");
 
@@ -258,7 +366,7 @@ module.exports.followersList = async function (req) {
       },
     ]);
     const user = await userModel
-      .findById(req.user._id)
+      .findById(userId)
       .populate("followers", "fullname")
       .populate("following", "fullname");
 
@@ -281,6 +389,7 @@ module.exports.followersList = async function (req) {
       })
       .select("fullname username _id profileImage");
 
+    console.log(friends.length, userfollowers.length, userfollowing.length);
     return [userfollowers, userfollowing, friends];
   } catch (err) {
     return null;
