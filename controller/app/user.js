@@ -128,9 +128,13 @@ module.exports.followOtherUser = async function (req) {
   try {
     let followedUser = await userModel.findById(req.body.id);
     console.log(req.body);
-    let loggedInUser = await userModel.findById(req.user.id);
+    let loggedInUser = await userModel.findById(req.user?._id);
 
-    if (!followedUser || !loggedInUser) {
+    if (
+      !followedUser ||
+      !loggedInUser ||
+      followedUser?._id.toString() === loggedInUser?._id.toString()
+    ) {
       throw new Error("Something went wrong!");
     }
 
@@ -155,12 +159,13 @@ module.exports.followOtherUser = async function (req) {
 module.exports.unfollowOtherUser = async function (req) {
   try {
     // loggedIn User
-    let user = await userModel.findById(req.user.id);
+    let user = await userModel.findById(req.user?._id);
 
     let followingUser = await userModel.findById(req.body.id);
+    console.log(followingUser);
 
     if (!followingUser || !user) {
-      return res.status(404).json("error");
+      throw new Error("No user Found");
     }
 
     /* delete user id from loggedIn User ki following List */
@@ -174,10 +179,10 @@ module.exports.unfollowOtherUser = async function (req) {
     });
 
     await Promise.all([followingUser.save(), user.save()]);
-
-    res.status(200).json("success");
+    console.log("follow user found");
+    return [followingUser];
   } catch (err) {
-    res.status(500).json("internal server error!");
+    throw err;
   }
 };
 

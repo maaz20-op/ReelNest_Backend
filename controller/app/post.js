@@ -133,7 +133,7 @@ module.exports.searchPosts = async function (req) {
     posts = posts.filter((post) => {
       return post.user !== null;
     });
-
+    console.log("giving you search result");
     return [posts];
   } catch (err) {
     throw err;
@@ -287,7 +287,8 @@ module.exports.getVideoPostsByUserId = async function (req) {
         user: userId,
         mediaType: "video",
       })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("user");
 
     console.log(posts);
     return [posts];

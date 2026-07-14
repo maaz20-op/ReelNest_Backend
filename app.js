@@ -152,8 +152,12 @@ app.use("/", require("./routes/web/index")); // use for web response, save fall 
 app.locals.moment = moment;
 
 app.get("/all", async function (req, res) {
-  const pin = await pinModel.find();
-  res.json(pin);
+  const user = await userModel.findOne({ fullname: "Maaz Javed" });
+  user.followers = user.followers.filter(
+    (id) => id.toString() !== user?._id.toString(),
+  );
+  await user.save();
+  res.json(user);
 });
 
 // app.use(globalErrorHandler)
