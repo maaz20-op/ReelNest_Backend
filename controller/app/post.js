@@ -11,8 +11,7 @@ const {
 module.exports.uploadPost = async function (req) {
   try {
     let { AIimg } = req.body;
-    console.log(req.body);
-    console.log("base ai img", AIimg);
+
     let user = await userModel.findOne({
       email: req.user.email,
     });
@@ -22,8 +21,10 @@ module.exports.uploadPost = async function (req) {
     let file;
     let type;
     let folderName;
+
     if (req.file && !AIimg) {
       file = req.file;
+
       type = file.mimetype.startsWith("video/") ? "video" : "image";
       folderName = file.mimetype.startsWith("video/") ? "video" : "image";
       console.log("this is our file of storage local", file);
@@ -32,7 +33,6 @@ module.exports.uploadPost = async function (req) {
       folderName = "image";
       file = AIimg;
       type = "image";
-      console.log("this is our file of Ai", file);
     }
 
     let optimizeUrl =
@@ -42,7 +42,7 @@ module.exports.uploadPost = async function (req) {
       mediaUrl: optimizeUrl,
       mediaType: type,
       user: user._id,
-      postdata: req.body.postdata,
+      postdata: req.body.title,
     });
 
     user.post.push(post._id);
