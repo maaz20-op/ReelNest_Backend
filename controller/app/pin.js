@@ -67,12 +67,23 @@ module.exports.getSavedVideoPosts = async function (req) {
   try {
     if (!userId) throw new Error("No userId Found");
 
-    const pins = await pinModel
-      .find({
-        createdBy: userId,
-      })
-      .populate("savedPost")
-      .select("-_id savedPost");
+    const pins = await pinModel.aggregate([
+      {
+        $match: {
+          createdBy: userId,
+        },
+      },
+      {
+        $lookup: {
+          from: "posts",
+          localField: "_id",
+          foreignField: "savedPost",
+          as: "savedPosts",
+        },
+      },
+      { $unwind: "$savedPosts" },
+    ]);
+    console.log(pins);
 
     const newPins = [];
 
@@ -80,7 +91,7 @@ module.exports.getSavedVideoPosts = async function (req) {
       newPins.push(post?.savedPost);
     });
 
-    return [newPins];
+    return [pins];
   } catch (err) {
     throw err;
   }
