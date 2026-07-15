@@ -279,7 +279,12 @@ module.exports.videosFetchingFeedPage = async function (req) {
 
 module.exports.getVideoPostsByUserId = async function (req) {
   try {
-    const userId = req.params.id;
+    const { limit, page, userId } = req.query;
+
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 12;
+    const skip = Number(pageNum - 1) * limitNum;
+
     if (!userId) throw new Error("invalid information");
 
     const posts = await postModel
@@ -288,10 +293,19 @@ module.exports.getVideoPostsByUserId = async function (req) {
         mediaType: "video",
       })
       .sort({ createdAt: -1 })
-      .populate("user");
+      .populate("user")
+      .skip(skip)
+      .limit(limitNum + 1);
 
-    console.log(posts);
-    return [posts];
+    let hasNextPage = false;
+
+    if (posts.length >= limit) {
+      hasNextPage = true;
+      posts.pop();
+    }
+    console.log(posts.length);
+
+    return [posts, hasNextPage];
   } catch (err) {
     throw err;
   }
@@ -299,7 +313,11 @@ module.exports.getVideoPostsByUserId = async function (req) {
 
 module.exports.getImagePostsByUserId = async function (req) {
   try {
-    const userId = req.params.id;
+    const { limit, page, userId } = req.query;
+    const pageNum = Number(page) || 1;
+    const limitNum = Number(limit) || 12;
+    const skip = Number(pageNum - 1) * limitNum;
+
     if (!userId) throw new Error("invalid information");
 
     const posts = await postModel
@@ -307,10 +325,20 @@ module.exports.getImagePostsByUserId = async function (req) {
         user: userId,
         mediaType: "image",
       })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .populate("user")
+      .skip(skip)
+      .limit(limitNum + 1);
 
-    console.log(posts);
-    return [posts];
+    let hasNextPage = false;
+
+    if (posts.length >= limit) {
+      hasNextPage = true;
+      posts.pop();
+    }
+    console.log(posts.length);
+
+    return [posts, hasNextPage];
   } catch (err) {
     throw err;
   }

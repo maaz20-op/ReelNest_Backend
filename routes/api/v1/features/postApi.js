@@ -103,8 +103,8 @@ router.delete("/:id", isLoggedIn, apiRouteResFormate(deletePost));
 
 router.get("/", apiRouteResFormate(searchPosts));
 
-router.get("/video/:id", apiRouteResFormate(getVideoPostsByUserId));
+router.get("/video", apiRouteResFormate(getVideoPostsByUserId));
 
-router.get("/image/:id", apiRouteResFormate(getImagePostsByUserId));
+router.get("/image", apiRouteResFormate(getImagePostsByUserId));
 
 module.exports = router;

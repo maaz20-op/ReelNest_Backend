@@ -410,7 +410,7 @@ module.exports.getUserById = async function (req) {
     const user = await userModel
       .findById(userId)
       .select("fullname _id username profileImage bio followers following");
-    console.log(user);
+
     return [user];
   } catch (err) {
     throw err;
