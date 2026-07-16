@@ -44,8 +44,10 @@ module.exports.savePin = async function (req) {
 };
 
 module.exports.deletePin = async function (req) {
+  const pinId = req.params?.id;
   try {
-    let deletedPin = await pinModel.findByIdAndDelete(req.params.id);
+    if (!pinId) throw new Error("No Id Found");
+    let deletedPin = await pinModel.findByIdAndDelete(pinId);
 
     if (!deletedPin) {
       throw new Error("error", "Unable to delete your Pin");
@@ -55,14 +57,18 @@ module.exports.deletePin = async function (req) {
       { _id: req.user._id },
       { $pull: { pins: deletedPin._id } },
     );
-
-    return [userDeletedPin, deletedPin];
+    console.log("deleted saved post");
+    return ["success"];
   } catch (err) {
     throw err;
   }
 };
 
 module.exports.getSavedVideoPosts = async function (req) {
+  const { limit, page } = req.query;
+  const pageNum = Number(page) || 1;
+  const limitNum = Number(limit) || 12;
+  const skip = Number(pageNum - 1) * limitNum;
   const userId = req?.user?._id;
   try {
     if (!userId) throw new Error("No userId Found");
@@ -71,42 +77,6 @@ module.exports.getSavedVideoPosts = async function (req) {
       {
         $match: {
           createdBy: userId,
-        },
-      },
-      {
-        $lookup: {
-          from: "posts",
-          localField: "_id",
-          foreignField: "savedPost",
-          as: "savedPosts",
-        },
-      },
-      { $unwind: "$savedPosts" },
-    ]);
-    console.log(pins);
-
-    const newPins = [];
-
-    pins.forEach((post) => {
-      newPins.push(post?.savedPost);
-    });
-
-    return [pins];
-  } catch (err) {
-    throw err;
-  }
-};
-
-module.exports.getSavedImagePosts = async function (req) {
-  const userId = req?.user?._id;
-  try {
-    if (!userId) throw new Error("No userId Found");
-
-    const pins = await pinModel.aggregate([
-      {
-        $match: {
-          createdBy: userId,
-          mediaType: "image",
         },
       },
       {
@@ -114,24 +84,113 @@ module.exports.getSavedImagePosts = async function (req) {
           from: "posts",
           localField: "savedPost",
           foreignField: "_id",
-          as: "savedPostdData",
+          as: "savedPosts",
+        },
+      },
+      { $unwind: "$savedPosts" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "savedPosts.user",
+          foreignField: "_id",
+          as: "postUser",
+        },
+      },
+      { $unwind: "$postUser" },
+      {
+        $project: {
+          _id: 1,
+          postOwner: "$postUser",
+          postId: "$savedPosts._id",
+          mediaType: "$savedPosts.mediaType",
+          mediaUrl: "$savedPosts.mediaUrl",
+          likes: "$savedPosts.likes",
+          createdAt: "$savedPosts.createdAt",
+          comments: "$savedPosts.comments",
+          postdata: "$savedPosts.postdata",
+        },
+      },
+      { $limit: limitNum + 1 },
+      { $skip: skip },
+    ]);
+
+    let hasNextPage = false;
+
+    if (pins.length >= limit) {
+      hasNextPage = true;
+      pins.pop();
+    }
+    console.log(pins.length);
+
+    pins.reverse();
+
+    return [pins, hasNextPage];
+  } catch (err) {
+    throw err;
+  }
+};
+
+module.exports.getSavedImagePosts = async function (req) {
+  const { limit, page } = req.query;
+  const pageNum = Number(page) || 1;
+  const limitNum = Number(limit) || 12;
+  const skip = Number(pageNum - 1) * limitNum;
+  const userId = req?.user?._id;
+  try {
+    if (!userId) throw new Error("No userId Found");
+
+    const pins = await pinModel.aggregate([
+      {
+        $match: {
+          createdBy: userId,
         },
       },
       {
-        $project: {
-          savedPostData: 1,
+        $lookup: {
+          from: "posts",
+          localField: "savedPost",
+          foreignField: "_id",
+          as: "savedPosts",
         },
       },
+      { $unwind: "$savedPosts" },
+      {
+        $lookup: {
+          from: "users",
+          localField: "savedPosts.user",
+          foreignField: "_id",
+          as: "postUser", // Fixed: Removed '$' from here
+        },
+      },
+      { $unwind: "$postUser" }, // This remains '$postUser' because it's a field path reference
+      {
+        $project: {
+          _id: 1,
+          postOwner: "$postUser",
+          postId: "$savedPosts._id",
+          mediaType: "$savedPosts.mediaType",
+          mediaUrl: "$savedPosts.mediaUrl",
+          likes: "$savedPosts.likes",
+          createdAt: "$savedPosts.createdAt",
+          comments: "$savedPosts.comments",
+          postdata: "$savedPosts.postdata",
+        },
+      },
+      { $limit: limitNum + 1 },
+      { $skip: skip },
     ]);
 
-    console.log(pins);
-    const newPins = [];
+    let hasNextPage = false;
 
-    pins.forEach((post) => {
-      newPins.push(post?.savedPostData);
-    });
+    if (pins.length >= limit) {
+      hasNextPage = true;
+      pins.pop();
+    }
+    console.log(pins.length);
 
-    return [newPins];
+    pins.reverse();
+
+    return [pins, hasNextPage];
   } catch (err) {
     throw err;
   }
