@@ -60,7 +60,6 @@ module.exports.deletePost = async function (req) {
   if (!id) {
     throw new Error("something went Wrong!");
   }
-
   try {
     const post = await postModel.findById(id);
     if (!post) {
@@ -70,13 +69,11 @@ module.exports.deletePost = async function (req) {
     if (!user) {
       throw new Error("something went Wrong!");
     }
-
     const url = post.mediaUrl;
     const mediaType = post.mediaType;
     let result = await deleteimgFromCloudinary(url, mediaType);
     console.log(result);
     await post.deleteOne();
-
     user.post = user.post.filter(
       (eachId) => eachId.toString() !== post._id.toString(),
     );

@@ -8,24 +8,25 @@ module.exports.googleCallback = async (req) => {
     let userEmail = req.user;
     console.log("REUESTED USRR", userEmail);
     if (!userEmail) throw new Error("Google LogedIn failed!");
-  let user = await userModel.findOne({ email: userEmail});
-   if (!user) throw new Error("Failed to Login");
-  addLoginEmailToQueue(user.email, user.fullname);
-return [user];
+    let user = await userModel.findOne({ email: userEmail });
+    if (!user) throw new Error("Failed to Login");
+
+    return [user];
   } catch (err) {
- throw err;
+    throw err;
   }
+};
 
-}
-
-
-module.exports.googleConfigCallback = async function (accessToken, refreshToken, profile, done){
+module.exports.googleConfigCallback = async function (
+  accessToken,
+  refreshToken,
+  profile,
+  done,
+) {
   try {
-   let userEmail = profile.emails[0].value;
+    let userEmail = profile.emails[0].value;
     done(null, userEmail);
-
   } catch (err) {
-  done(err, false);
+    done(err, false);
   }
- 
-}
+};
