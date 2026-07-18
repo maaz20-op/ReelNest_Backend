@@ -5,15 +5,15 @@ const {
 } = require("../utils/apiResponse");
 const sendAccessAndRefreshTokenThroughCookies = require("./sendAccessAndRefreshTokenThroughCookie");
 
-const authPaths = ["/login"];
+const authPaths = ["/login", "/signup", "/googlecallback"];
 const apiRouteResFormate = (fn) => async (req, res) => {
   try {
-    const data = await fn(req);
+    const data = await fn(req, res);
     if (!data) {
       ApiResponseError(res, "No Data Found!", "Error", 304);
       return;
     }
-
+    console.log("this url", req.url);
     if (authPaths.includes(req.url)) {
       sendAccessAndRefreshTokenThroughCookies(data[0].email, res);
     }
