@@ -22,7 +22,7 @@ router.get(
 router.get(
   "/callback",
   passport.authenticate("google", {
-    failureRedirect: "https://reel-nest-frontend.vercel.app/login",
+    failureRedirect: "http://localhost:5173/login",
     session: false,
   }),
   apiRouteResFormate(googleCallback),
