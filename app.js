@@ -147,7 +147,6 @@ app.set("views", path.join(__dirname, "views")); // make sure views folder ka pa
 
 // mounting of routes
 app.use("/api/v1", require("./routes/api/v1/index")); // use for api v1 response, save fall back for index.js if package.json has main feild
-app.use("/", require("./routes/web/index")); // use for web response, save fall back for index.js
 
 app.locals.moment = moment;
 
