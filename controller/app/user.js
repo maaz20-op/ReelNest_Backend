@@ -43,7 +43,7 @@ module.exports.updateAccountSettings = async function (req) {
       updatedData,
       { new: true },
     );
-    console.log(updatedUser);
+    console.log(updatedUser.accountVisibility);
     return [updatedUser];
   } catch (err) {
     throw err;

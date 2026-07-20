@@ -183,47 +183,53 @@ module.exports.videosFetchingFeedPage = async function (req) {
     const page = Number(req.query.page) || 2;
     const limit = 4;
     const skip = (page - 1) * limit;
-    //console.log(`in video skip = ${skip} and page = ${page}`)
 
     const posts = await postModel.aggregate([
+      // 1. Sirf videos
       {
         $match: {
           mediaType: "video",
         },
       },
 
-      {
-        $sort: {
-          createdAt: -1,
-        },
-      },
-
-      { $skip: skip },
-      { $limit: limit + 1 },
-
+      // 2. User ko join karo
       {
         $lookup: {
           from: "users",
           localField: "user",
           foreignField: "_id",
-          pipeline: [{ $sort: { followers: -1 } }, { $limit: 3 }],
           as: "userData",
         },
       },
 
+      // 3. Array ko object banao
       {
-        $unwind: {
-          path: "$userData",
-          preserveNullAndEmptyArrays: true,
-        },
+        $unwind: "$userData",
       },
 
+      // 4. Sirf public account ki posts rakho
       {
         $match: {
           "userData.accountVisibility": "Public",
         },
       },
 
+      // 5. Ab sort karo
+      {
+        $sort: {
+          createdAt: -1,
+        },
+      },
+
+      // 6. Ab pagination lagao
+      {
+        $skip: skip,
+      },
+      {
+        $limit: limit + 1,
+      },
+
+      // 7. Likes ka data
       {
         $lookup: {
           from: "users",
@@ -232,6 +238,8 @@ module.exports.videosFetchingFeedPage = async function (req) {
           as: "likesData",
         },
       },
+
+      // 8. Final response
       {
         $project: {
           _id: 1,
@@ -240,6 +248,7 @@ module.exports.videosFetchingFeedPage = async function (req) {
           mediaUrl: 1,
           createdAt: 1,
           postdata: 1,
+
           "userData.fullname": 1,
           "userData.username": 1,
           "userData._id": 1,
@@ -263,8 +272,6 @@ module.exports.videosFetchingFeedPage = async function (req) {
     ]);
 
     const hasNextPage = posts.length > limit; // check  next post is avaliable
-
-    console.log(posts);
 
     if (hasNextPage) posts.pop();
 

@@ -66,52 +66,47 @@ app.use(
   }),
 );
 
-/*
 app.use(helmet());
-app.use(helmet.contentSecurityPolicy({
-  directives: {
-  defaultSrc: ["'self'"],
-  
-  imgSrc: [
-    "'self'", 
-    "https://res.cloudinary.com",
-     "https://freeimage.host",
-     "https://iili.io"
-    ],
-  
-  styleSrc: [
+app.use(
+  helmet.contentSecurityPolicy({
+    directives: {
+      defaultSrc: ["'self'"],
+
+      imgSrc: [
+        "'self'",
+        "https://res.cloudinary.com",
+        "https://freeimage.host",
+        "https://iili.io",
+      ],
+
+      styleSrc: [
         "'self'",
         "'unsafe-inline'",
         "https://cdnjs.cloudflare.com",
-        "https://fonts.googleapis.com"
+        "https://fonts.googleapis.com",
       ],
-  
-  connectSrc: ["'self'","https://api.cloudinary.com", "ws:" , "http:"],
-  
-  mediaSrc: [
-    "'self'",
-  "https://res.cloudinary.com"
-  ],
-  
-  scriptSrc: [
-  "'self'",
-  "https://cdnjs.cloudflare.com",
-  "https://widget.cloudinary.com",
-],
-  fontSrc: [
-       "'self'",
+
+      connectSrc: ["'self'", "https://api.cloudinary.com", "ws:", "http:"],
+
+      mediaSrc: ["'self'", "https://res.cloudinary.com"],
+
+      scriptSrc: [
+        "'self'",
+        "https://cdnjs.cloudflare.com",
+        "https://widget.cloudinary.com",
+      ],
+      fontSrc: [
+        "'self'",
         "https://cdnjs.cloudflare.com",
         "https://fonts.gstatic.com",
-        "'unsafe-inline'"
+        "'unsafe-inline'",
       ],
- frameAncestors: ["'none'"],
-  },
-  reportViolations: true,
-  reportUri: "/csp-violation"
-  
-})
-)
-*/
+      frameAncestors: ["'none'"],
+    },
+    reportViolations: true,
+    reportUri: "/csp-violation",
+  }),
+);
 
 app.use(flash());
 
@@ -142,13 +137,18 @@ app.use(express.urlencoded({ extended: false }));
 
 // 🖼️ View engine
 app.set("view engine", "ejs");
-app.set("views", path.join(__dirname, "views")); // make sure views folder ka path theek hai
+app.set("views", path.join(__dirname, "views"));
 // 📁 Routes
 
 // mounting of routes
 app.use("/api/v1", require("./routes/api/v1/index")); // use for api v1 response, save fall back for index.js if package.json has main feild
 
 app.locals.moment = moment;
+
+app.get("/csp-violation", function (req, res) {
+  console.log("Some voilation made");
+  res.send("Some voilation of helmet is made");
+});
 
 app.get("/all", async function (req, res) {
   const user = await userModel.findOne({ fullname: "Maaz Javed" });
