@@ -1,7 +1,11 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
 const isLoggedIn = require("../../../../middlewares/isLoggedIn");
-const { createComment, showAllComments } = require("../../../../controller/app/comment");
+const {
+  createComment,
+  showAllComments,
+  deleteComment,
+} = require("../../../../controller/app/comment");
 const apiRouteResFormate = require("../../../../utils/ApiRoute");
 
 // REST Api ---> Standarads
@@ -10,12 +14,8 @@ const apiRouteResFormate = require("../../../../utils/ApiRoute");
 router.post("/", isLoggedIn, apiRouteResFormate(createComment));
 
 // get Comments of particular post
-router.get("/",  apiRouteResFormate(showAllComments));
+router.get("/", apiRouteResFormate(showAllComments));
+
+router.delete("/", isLoggedIn, apiRouteResFormate(deleteComment));
 
 module.exports = router;
-
-
-
-
-
-

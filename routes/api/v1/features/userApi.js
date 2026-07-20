@@ -13,6 +13,7 @@ const {
   getUserById,
   getUserConnectionsById,
   getLoggedInUserConnections,
+  getBlockedUser,
 } = require("../../../../controller/app/user.js");
 const upload = require("../../../../config/multerConfig.js");
 const apiRouteResFormate = require("../../../../utils/ApiRoute");
@@ -36,6 +37,8 @@ router.get(
 router.patch("/block", isLoggedIn, apiRouteResFormate(blockOtherUser));
 
 router.patch("/unblock", isLoggedIn, apiRouteResFormate(unblockUser));
+
+router.get("/block", isLoggedIn, apiRouteResFormate(getBlockedUser));
 
 router.get("/:id", isLoggedIn, apiRouteResFormate(getUserById));
 

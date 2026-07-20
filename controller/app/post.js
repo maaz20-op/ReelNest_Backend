@@ -112,7 +112,8 @@ module.exports.searchPosts = async function (req) {
   try {
     let input = req.query.text;
     console.log(input);
-    if (!input) {
+    const loggedInUser = await userModel.findById(req.user?._id);
+    if (!input || !loggedInUser) {
       throw new Error("something went Wrong!");
     }
 
@@ -123,6 +124,9 @@ module.exports.searchPosts = async function (req) {
         model: "User",
         match: {
           accountVisibility: "Public",
+          blockedBy: {
+            $nin: [loggedInUser?._id],
+          },
         },
         select: "-post -bio",
       });
@@ -184,15 +188,16 @@ module.exports.videosFetchingFeedPage = async function (req) {
     const limit = 4;
     const skip = (page - 1) * limit;
 
+    const loggedInUser = await userModel.findById(req.user?._id);
+    if (!loggedInUser) throw new Error("No User");
+
     const posts = await postModel.aggregate([
-      // 1. Sirf videos
       {
         $match: {
           mediaType: "video",
         },
       },
 
-      // 2. User ko join karo
       {
         $lookup: {
           from: "users",
@@ -202,19 +207,19 @@ module.exports.videosFetchingFeedPage = async function (req) {
         },
       },
 
-      // 3. Array ko object banao
       {
         $unwind: "$userData",
       },
 
-      // 4. Sirf public account ki posts rakho
       {
         $match: {
           "userData.accountVisibility": "Public",
+          "userData.blockedBy": {
+            $nin: [loggedInUser._id],
+          },
         },
       },
 
-      // 5. Ab sort karo
       {
         $sort: {
           createdAt: -1,

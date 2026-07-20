@@ -58,11 +58,11 @@ module.exports.blockOtherUser = async function (req) {
       throw new Error("error", "Error to Block the User");
     }
     // logged in user
-    let user = await userModel.findById(req.user.id);
+    let user = await userModel.findById(req.user._id);
 
     /* remove blocked user form following list*/
     if (
-      user.following.includes(blockedUser._id) &&
+      user.following.includes(blockedUser._id) ||
       blockedUser.followers.includes(user._id)
     ) {
       blockedUser.followers = blockedUser.followers.filter((id) => {
@@ -73,12 +73,25 @@ module.exports.blockOtherUser = async function (req) {
         return id.toString() !== blockedUser._id.toString();
       });
     }
+    if (!user.blockedUserId.includes(blockedUser?._id)) {
+      user.blockedUserId.push(blockedUser._id);
+      blockedUser.blockedBy.push(user._id);
+      await Promise.all([user.save(), blockedUser.save()]);
+    }
 
-    user.blockedUserId.push(blockedUser._id);
-    blockedUser.blockedBy.push(user._id);
-    await Promise.all([user.save(), blockedUser.save()]);
+    return [blockedUser];
+  } catch (err) {
+    throw err;
+  }
+};
 
-    return [blockedUser, user];
+module.exports.getBlockedUser = async function (req) {
+  try {
+    const user = await userModel
+      .findById(req.user?._id)
+      .populate("blockedUserId", "fullname _id profileImage username");
+    console.log("hihhi", user.blockedUserId);
+    return [user?.blockedUserId];
   } catch (err) {
     throw err;
   }

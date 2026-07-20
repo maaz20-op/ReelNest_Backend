@@ -78,3 +78,33 @@ module.exports.showAllComments = async function (req) {
     throw err;
   }
 };
+
+module.exports.deleteComment = async function (req) {
+  const { commentId, postId } = req.body;
+  try {
+    const user = await userModel.findById(req.user?._id);
+    const comment = await commentModel.findById(commentId);
+    if (!commentId || !comment || !postId || !user)
+      throw new Error("something went wrong!");
+
+    const post = await postModel.findById(postId);
+
+    if (!post) throw new Error("something went wrong!");
+
+    post.comments = post.comments.filter(
+      (c) => c?._id.toString() !== commentId.toString(),
+    );
+
+    user.userCommented = user.userCommented.filter(
+      (c) => c?._id.toString() !== commentId.toString(),
+    );
+
+    const deletedComment = await commentModel.findByIdAndDelete(commentId);
+
+    await Promise.all([user.save(), post.save()]);
+
+    return ["Success"];
+  } catch (err) {
+    throw err;
+  }
+};

@@ -88,7 +88,7 @@ async function getComments(userId){
 */
 router.get("/images", isLoggedIn, apiRouteResFormate(imagesFetchingFeedPage));
 
-router.get("/videos", apiRouteResFormate(videosFetchingFeedPage));
+router.get("/videos", isLoggedIn, apiRouteResFormate(videosFetchingFeedPage));
 
 router.post(
   "/",
@@ -101,7 +101,7 @@ router.patch("/like/:id", isLoggedIn, apiRouteResFormate(likePost));
 
 router.delete("/:id", isLoggedIn, apiRouteResFormate(deletePost));
 
-router.get("/", apiRouteResFormate(searchPosts));
+router.get("/", isLoggedIn, apiRouteResFormate(searchPosts));
 
 router.get("/video", apiRouteResFormate(getVideoPostsByUserId));
 
