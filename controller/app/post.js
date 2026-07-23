@@ -7,11 +7,14 @@ const mongoose = require("mongoose");
 const {
   deleteimgFromCloudinary,
 } = require("../../utils/deleteImageFromCloudinary.js");
+const ApiError = require("../../utils/apiError.js");
 
 module.exports.uploadPost = async function (req) {
   try {
     let { AIimg } = req.body;
+    console.log(req.body);
 
+    if (!req.body.title) throw ApiError(404, "Post Title is Missing!");
     let user = await userModel.findOne({
       email: req.user.email,
     });
@@ -21,8 +24,9 @@ module.exports.uploadPost = async function (req) {
     let file;
     let type;
     let folderName;
+    let AiImgUrl;
 
-    if (req.file && !AIimg) {
+    if (req?.file && !AIimg) {
       file = req.file;
 
       type = file.mimetype.startsWith("video/") ? "video" : "image";
@@ -30,14 +34,20 @@ module.exports.uploadPost = async function (req) {
       console.log("this is our file of storage local", file);
     } else if (AIimg && !req.file) {
       // send image from frontend!
+
+      AiImgUrl = await cloudinary.uploader.upload(AIimg, {
+        public_id: "ReelNest_Ai_Image",
+        folder: "ReelNest/images/Ai",
+      });
       folderName = "image";
       file = AIimg;
       type = "image";
     }
 
-    let optimizeUrl =
-      file.path?.replace("/upload/", "/upload/q_auto,f_auto/") || file;
-
+    let optimizeUrl = file?.path
+      ? file.path.replace("/upload/", "/upload/q_auto:best,f_auto/")
+      : AiImgUrl?.secure_url.replace("/upload/", "/upload/q_auto:best,f_auto/");
+    console.log(optimizeUrl);
     let post = await postModel.create({
       mediaUrl: optimizeUrl,
       mediaType: type,
@@ -57,28 +67,29 @@ module.exports.uploadPost = async function (req) {
 module.exports.deletePost = async function (req) {
   const id = req.params.id;
   console.log(id);
-  if (!id) {
-    throw new Error("something went Wrong!");
-  }
+
   try {
+    if (!id) {
+      throw new Error("something went Wrong!");
+    }
     const post = await postModel.findById(id);
     if (!post) {
       throw new Error("Please Give a Valid Post!");
     }
-    const user = await userModel.findById(req.user.id);
+    const user = await userModel.findById(req.user._id);
     if (!user) {
       throw new Error("something went Wrong!");
     }
     const url = post.mediaUrl;
     const mediaType = post.mediaType;
     let result = await deleteimgFromCloudinary(url, mediaType);
-    console.log(result);
+
     await post.deleteOne();
     user.post = user.post.filter(
       (eachId) => eachId.toString() !== post._id.toString(),
     );
     await user.save();
-    console.log("deleted post");
+
     return ["success"];
   } catch (err) {
     throw err;
@@ -88,7 +99,7 @@ module.exports.deletePost = async function (req) {
 module.exports.likePost = async function (req) {
   try {
     let post = await postModel.findById(req.params.id);
-    let loggedInUser = await userModel.findById(req.user.id);
+    let loggedInUser = await userModel.findById(req.user._id);
 
     if (!post || !loggedInUser) {
       throw new Error("Something went Wrong!");
@@ -189,7 +200,7 @@ module.exports.videosFetchingFeedPage = async function (req) {
     const skip = (page - 1) * limit;
 
     const loggedInUser = await userModel.findById(req.user?._id);
-    if (!loggedInUser) throw new Error("No User");
+    if (!loggedInUser) throw ApiError(404, "User not Found");
 
     const posts = await postModel.aggregate([
       {
@@ -296,7 +307,7 @@ module.exports.getVideoPostsByUserId = async function (req) {
 
     if (!userId) throw new Error("invalid information");
 
-    const posts = await postModel
+    let posts = await postModel
       .find({
         user: userId,
         mediaType: "video",
@@ -312,7 +323,19 @@ module.exports.getVideoPostsByUserId = async function (req) {
       hasNextPage = true;
       posts.pop();
     }
-    console.log(posts.length);
+
+    posts = posts.map((post) => ({
+      _id: post?._id,
+      mediaUrl: post?.mediaUrl,
+      mediaType: post?.mediaType,
+      user: post?.user,
+      likes: post?.likes,
+      postdata: post?.postdata,
+      comments: post?.comments,
+      createdAt: post?.createdAt,
+      page: Number(page),
+    }));
+    console.log(posts);
 
     return [posts, hasNextPage];
   } catch (err) {

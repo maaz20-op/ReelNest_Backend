@@ -10,7 +10,7 @@ module.exports.createComment = async function (req) {
   try {
     let post = await postModel.findById(id);
     if (!post) throw new Error("not valid post");
-    let loggedInUser = await userModel.findById(req.user.id);
+    let loggedInUser = await userModel.findById(req.user._id);
 
     let comment = await commentModel.create({
       text: input,

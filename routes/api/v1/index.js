@@ -8,7 +8,7 @@ const { setCache, makeKey } = require("../../../utils/setAndGetRedisKeys.js");
 router.use("/users", require("./features/userApi"));
 router.use("/posts", require("./features/postApi"));
 router.use("/pins", require("./features/pinApi"));
-router.use("/Ai-features", require("./features/ai-huggyFaceApi.js"));
+router.use("/ai-features", require("./features/ai-huggyFaceApi.js"));
 router.use("/comments", require("./features/commentApi"));
 router.use("/payments", require("./features/paymentApi.js"));
 router.use("/auth/local", require("./auth/local.js"));

@@ -24,7 +24,7 @@ module.exports.editprofpic = async function (req) {
 
 module.exports.updateAccountSettings = async function (req) {
   try {
-    let dbuser = await userModel.findById(req.user?.id);
+    let dbuser = await userModel.findById(req.user?._id);
     let updatedData = {};
     console.log(req.body);
     for (let key in req.body) {
@@ -39,10 +39,11 @@ module.exports.updateAccountSettings = async function (req) {
     if (Object.keys(updatedData).length === 0)
       throw new Error("You did'nt make any Changes!");
     const updatedUser = await userModel.findByIdAndUpdate(
-      req.user?.id,
+      req.user?._id,
       updatedData,
       { new: true },
     );
+    console.log(updatedUser);
     console.log(updatedUser.accountVisibility);
     return [updatedUser];
   } catch (err) {
@@ -103,7 +104,7 @@ module.exports.unblockUser = async function (req) {
 
     if (!blockedUser) return;
 
-    let user = await userModel.findById(req.user?.id);
+    let user = await userModel.findById(req.user?._id);
 
     user.blockedUserId = user.blockedUserId.filter((id) => {
       return id.toString() !== blockedUser._id.toString();

@@ -49,7 +49,7 @@ module.exports.signupUser = async function (req) {
 
     return [createdUser];
   } catch (err) {
-    throw err;
+    return err;
   }
 };
 
@@ -88,25 +88,7 @@ module.exports.logoutUser = async function (req) {
     // other work done in res middleware
     return ["request Reached!"];
   } catch (err) {
-    throw err;
-  }
-};
-
-module.exports.getAccessToken = async function (req) {
-  try {
-    let user = await userModel.findOne({
-      email: req.session.backupUser?.email,
-    });
-
-    if (!user) throw new Error("server error 500");
-
-    // delete backup user from session
-    delete req.session.backupUser;
-
-    req.session.requestURL || "/";
-    return [user];
-  } catch (err) {
-    throw err;
+    return err;
   }
 };
 
@@ -122,47 +104,30 @@ module.exports.sendLoggedInUser = async function (req) {
   }
 };
 
-module.exports.getEmailForVerification = function (req) {
-  try {
-    let verificationEmail = req.body.email;
-    if (!verificationEmail) {
-      throw new Error("Please enter your email");
-    }
-    req.session.email = verificationEmail;
-
-    return ["Email granted"];
-  } catch (err) {
-    throw err;
-  }
-};
-
 module.exports.sendOTP = async function (req, res) {
   try {
     let verificationEmail = req.body.email;
-    if (!verificationEmail) return res.redirect("/enterEmailForOTP");
+    if (!verificationEmail) throw new Error("No email found");
     let otp = generateOTP();
     req.session.otp = otp;
-    console.log("session otp", req.session.otp);
+    req.session.email = verificationEmail;
+    console.log("session otp", req.session.otp, req.session.email);
     sendOptonEmail(verificationEmail, req.session.otp);
     if (!req.session.email && !req.session.otp) {
-      res.json({
-        success: false,
-        message: "Error storing OTP or email in session",
-      });
+      throw new Error("something went wrong!");
     }
-    res.json({ success: true, message: "OTP sent successfully", otp });
+    return [otp];
   } catch (err) {
-    console.log(err);
-    res.json({ success: false, message: "Error in verifiaction try later" });
+    return err;
   }
 };
 
-module.exports.forgotPassword = async function (req) {
+module.exports.verifyOtp = async function (req) {
   try {
-    let { val1, val2, val3, val4 } = req.body;
+    let { otp } = req.body;
     let emailOTP = req.session.otp;
     let verificationEmail = req.session?.email;
-    let userInputOPT = `${val1}${val2}${val3}${val4}`;
+    let userInputOPT = otp.toString();
     console.log(emailOTP, userInputOPT);
     if (emailOTP.toString() !== userInputOPT.toString())
       throw new Error("wrong OTP code");
@@ -180,6 +145,6 @@ module.exports.forgotPassword = async function (req) {
     console.log("session after delete", req.session.otp, req.session.email);
     return [user];
   } catch (err) {
-    throw err;
+    return err;
   }
 };

@@ -4,7 +4,7 @@ const {
   signupUser,
   loginUser,
   logoutUser,
-  forgotPassword,
+  verifyOtp,
   sendOTP,
   getEmailForVerification,
   getAccessToken,
@@ -23,14 +23,9 @@ router.post("/login", apiRouteResFormate(loginUser));
 // send loggedIn in user to frontend
 router.get("/me", isLoggedIn, apiRouteResFormate(sendLoggedInUser));
 
-router.post("/OTP", apiRouteResFormate(sendOTP));
+router.post("/get-otp", apiRouteResFormate(sendOTP));
 
-router.post("/refresh", apiRouteResFormate(getAccessToken));
-
-// getting verification email for forgot password
-router.post("/verify-email", apiRouteResFormate(getEmailForVerification));
-
-router.post("/forgot-password", apiRouteResFormate(forgotPassword));
+router.post("/verify-otp", apiRouteResFormate(verifyOtp));
 
 router.post("/logout", apiRouteResFormate(logoutUser));
 
