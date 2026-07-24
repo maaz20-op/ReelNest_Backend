@@ -234,10 +234,10 @@ module.exports.getUserConnectionsById = async function (req) {
 
       {
         $project: {
-          "data._id": 1,
-          "data.fullname": 1,
-          "data.username": 1,
-          "data.profileImage": 1,
+          _id: "$data._id",
+          fullname: "$data.fullname",
+          username: "$data.username",
+          profileImage: "$data.profileImage",
         },
       },
     ]);
