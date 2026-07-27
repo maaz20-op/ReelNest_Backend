@@ -2,7 +2,7 @@ const messageModel = require("../../models/message-model");
 
 module.exports.getMessages = async function (req) {
   const { chatedUserId, limit = 10, page = 1 } = req.query;
-  console.log(req.user?._id);
+
   const pageNum = Number(page);
   const limitNum = Number(limit);
   const skip = (pageNum - 1) * limitNum;
