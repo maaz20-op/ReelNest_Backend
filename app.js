@@ -141,10 +141,10 @@ app.use("/api/v1", require("./routes/api/v1/index")); // use for api v1 response
 
 app.locals.moment = moment;
 
-app.get("/csp-violation", function (req, res) {
-  console.log("Some voilation made");
-  res.send("Some voilation of helmet is made");
-});
+// app.get("/csp-violation", function (req, res) {
+//   console.log("Some voilation made");
+//   res.send("Some voilation of helmet is made");
+// });
 
 app.get("/all", async function (req, res) {
   const user = await messageModel.find();
