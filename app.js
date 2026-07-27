@@ -16,14 +16,19 @@ const axios = require("axios");
 const cors = require("cors");
 const cookieParser = require("cookie-parser");
 const session = require("express-session");
-const flash = require("connect-flash");
+
 const MongoStore = require("connect-mongo");
 const { Server } = require("socket.io");
 const http = require("http");
 const server = http.createServer(app);
 const userModel = require("./models/user-model");
 const helmet = require("helmet");
-const io = new Server(server);
+const io = new Server(server, {
+  cors: {
+    origin: ["http://localhost:5173", "https://reel-nest-frontend.vercel.app"],
+    methods: ["GET", "POST"],
+  },
+});
 const userWatcherStreams = require("./changeStreams/userWatcher");
 const passport = require("passport");
 require("./config/googlePassport");
@@ -39,6 +44,7 @@ require("./queues/emailQueue");
 
 const msgModel = require("./models/message-model");
 const pinModel = require("./models/pin-model");
+const messageModel = require("./models/message-model");
 //userWatcherStreams()
 messageSocketsConnection(io);
 
@@ -66,58 +72,48 @@ app.use(
   }),
 );
 
-app.use(helmet());
-app.use(
-  helmet.contentSecurityPolicy({
-    directives: {
-      defaultSrc: ["'self'"],
+// app.use(helmet());
+// app.use(
+//   helmet.contentSecurityPolicy({
+//     directives: {
+//       defaultSrc: ["'self'"],
 
-      imgSrc: [
-        "'self'",
-        "https://res.cloudinary.com",
-        "https://freeimage.host",
-        "https://iili.io",
-      ],
+//       imgSrc: [
+//         "'self'",
+//         "https://res.cloudinary.com",
+//         "https://freeimage.host",
+//         "https://iili.io",
+//       ],
 
-      styleSrc: [
-        "'self'",
-        "'unsafe-inline'",
-        "https://cdnjs.cloudflare.com",
-        "https://fonts.googleapis.com",
-      ],
+//       styleSrc: [
+//         "'self'",
+//         "'unsafe-inline'",
+//         "https://cdnjs.cloudflare.com",
+//         "https://fonts.googleapis.com",
+//       ],
 
-      connectSrc: ["'self'", "https://api.cloudinary.com", "ws:", "http:"],
+//       connectSrc: ["'self'", "https://api.cloudinary.com", "ws:", "http:"],
 
-      mediaSrc: ["'self'", "https://res.cloudinary.com"],
+//       mediaSrc: ["'self'", "https://res.cloudinary.com"],
 
-      scriptSrc: [
-        "'self'",
-        "https://cdnjs.cloudflare.com",
-        "https://widget.cloudinary.com",
-      ],
-      fontSrc: [
-        "'self'",
-        "https://cdnjs.cloudflare.com",
-        "https://fonts.gstatic.com",
-        "'unsafe-inline'",
-      ],
-      frameAncestors: ["'none'"],
-    },
-    reportViolations: true,
-    reportUri: "/csp-violation",
-  }),
-);
+//       scriptSrc: [
+//         "'self'",
+//         "https://cdnjs.cloudflare.com",
+//         "https://widget.cloudinary.com",
+//       ],
+//       fontSrc: [
+//         "'self'",
+//         "https://cdnjs.cloudflare.com",
+//         "https://fonts.gstatic.com",
+//         "'unsafe-inline'",
+//       ],
+//       frameAncestors: ["'none'"],
+//     },
+//     reportViolations: true,
+//     reportUri: "/csp-violation",
+//   }),
+// );
 
-app.use(flash());
-
-//app.use(checkOrigin); //check is origin is trusted site e.g reelnest.com
-
-// 📢 Flash messages for EJS views
-app.use(function (req, res, next) {
-  res.locals.success = req.flash("success");
-  res.locals.error = req.flash("error");
-  next();
-});
 app.use((req, res, next) => {
   console.log(req.url);
   next();
@@ -151,11 +147,8 @@ app.get("/csp-violation", function (req, res) {
 });
 
 app.get("/all", async function (req, res) {
-  const user = await userModel.findOne({ fullname: "Maaz Javed" });
-  user.followers = user.followers.filter(
-    (id) => id.toString() !== user?._id.toString(),
-  );
-  await user.save();
+  const user = await messageModel.find();
+
   res.json(user);
 });
 
