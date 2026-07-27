@@ -26,7 +26,9 @@ const helmet = require("helmet");
 const io = new Server(server, {
   cors: {
     origin: ["http://localhost:5173", "https://reel-nest-frontend.vercel.app"],
-    methods: ["GET", "POST"],
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+    credentials: true, // Allows the backend to receive/send cookies
+    allowedHeaders: ["Content-Type", "Authorization"],
   },
 });
 const userWatcherStreams = require("./changeStreams/userWatcher");
@@ -124,6 +126,7 @@ app.use(
     origin: ["http://localhost:5173", "https://reel-nest-frontend.vercel.app/"],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // Allows the backend to receive/send cookies
+    allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
