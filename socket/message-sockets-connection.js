@@ -10,6 +10,29 @@ function messageSocketsConnection(io) {
       socketMapID[username] = socket.id;
       console.log(socketMapID);
     });
+
+    socket.on("call-user", ({ username, offer, from }) => {
+      console.log("calling to", username);
+      socket
+        .to(socketMapID[username])
+        .emit("call-user", { username, offer, from });
+    });
+
+    socket.on("call:ended", ({ to }) => {
+      console.log("called tell to", to);
+      socket.to(socketMapID[to]).emit("call:ended", { callended: true });
+    });
+
+    socket.on("call-accepted", ({ answer, from }) => {
+      console.log(answer, from);
+      socket.to(socketMapID[from]).emit("call-accepted", { answer, from });
+    });
+
+    socket.on("ice-candidate", ({ candidate, to, from }) => {
+      console.log("this is candidate", from, candidate);
+      io.to(socketMapID[to]).emit("ice-candidate", { candidate });
+    });
+
     console.log(socket.id);
     socket.on("chat-msg", async ({ msg, to, from }) => {
       let room = socketMapID[to];
@@ -46,7 +69,7 @@ function messageSocketsConnection(io) {
     });
 
     socket.on("disconnect", () => {
-      console.log("❌ Disconnected:", socket.id);
+      console.log("❌ Disconnected:", socket.id, socketMapID);
       for (let user in socketMapID) {
         if (socketMapID[user] === socket.id) {
           delete socketMapID[user];

@@ -25,7 +25,11 @@ const userModel = require("./models/user-model");
 const helmet = require("helmet");
 const io = new Server(server, {
   cors: {
-    origin: ["http://localhost:5173", "https://reel-nest-frontend.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "https://reel-nest-frontend.vercel.app",
+      "https://rdjn9mkg-5173.inc1.devtunnels.ms",
+    ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // Allows the backend to receive/send cookies
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -46,7 +50,6 @@ require("./queues/emailQueue");
 
 const msgModel = require("./models/message-model");
 const pinModel = require("./models/pin-model");
-const messageModel = require("./models/message-model");
 //userWatcherStreams()
 messageSocketsConnection(io);
 
@@ -116,6 +119,8 @@ app.use(
 //   }),
 // );
 
+//app.use(checkOrigin); //check is origin is trusted site e.g reelnest.com
+
 app.use((req, res, next) => {
   console.log(req.url);
   next();
@@ -123,7 +128,11 @@ app.use((req, res, next) => {
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://reel-nest-frontend.vercel.app"],
+    origin: [
+      "http://localhost:5173",
+      "https://reel-nest-frontend.vercel.app",
+      "https://rdjn9mkg-5173.inc1.devtunnels.ms",
+    ],
     methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
     credentials: true, // Allows the backend to receive/send cookies
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -144,22 +153,20 @@ app.set("views", path.join(__dirname, "views"));
 // mounting of routes
 app.use("/api/v1", require("./routes/api/v1/index")); // use for api v1 response, save fall back for index.js if package.json has main feild
 
-app.locals.moment = moment;
-
 // app.get("/csp-violation", function (req, res) {
 //   console.log("Some voilation made");
 //   res.send("Some voilation of helmet is made");
 // });
 
 app.get("/all", async function (req, res) {
-  const user = await messageModel.find();
-
+  const user = await userModel.findOne({ fullname: "Maaz Javed" });
+  user.followers = user.followers.filter(
+    (id) => id.toString() !== user?._id.toString(),
+  );
+  await user.save();
   res.json(user);
 });
 
-// app.use(globalErrorHandler)
-
-// 🚀 Start Server
 const PORT = process.env.PORT || 3000;
 
 server.listen(PORT, function () {

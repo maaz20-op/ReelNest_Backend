@@ -26,6 +26,7 @@ module.exports.getMessages = async function (req) {
   const hasNextPage = messages.length > limitNum;
   console.log("SSSS", messages);
   if (hasNextPage) messages.pop();
+  messages.reverse();
 
   return [messages, hasNextPage];
 };
