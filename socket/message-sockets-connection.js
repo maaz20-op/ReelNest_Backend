@@ -11,26 +11,62 @@ function messageSocketsConnection(io) {
       console.log(socketMapID);
     });
 
+    socket.on("initialize-call-request", ({ to, from, callingUser }) => {
+      console.log("calling reuqest from", from, "to", to);
+      socket
+        .to(socketMapID[to])
+        .emit("initialize-call-request", { to, from, callingUser });
+    });
+
     socket.on("call-user", ({ username, offer, from }) => {
-      console.log("calling to", username);
+      console.log("calling to", username, offer);
       socket
         .to(socketMapID[username])
         .emit("call-user", { username, offer, from });
     });
 
-    socket.on("call:ended", ({ to }) => {
-      console.log("called tell to", to);
-      socket.to(socketMapID[to]).emit("call:ended", { callended: true });
-    });
+    socket.on(
+      "call:ended",
+      ({ to, declined, isCallEndedBeforeRemoteExpect }) => {
+        let isDeclined = declined;
+        let isCallEndedBeforeConnection = isCallEndedBeforeRemoteExpect;
+        if (!isDeclined) {
+          isDeclined = false;
+        }
+
+        if (!isCallEndedBeforeConnection) isCallEndedBeforeConnection = false;
+        console.log("call ended tell to", to);
+        socket
+          .to(socketMapID[to])
+          .emit("call:ended", {
+            callended: true,
+            declined: isDeclined,
+            isCallEndedBeforeRemoteExpect: isCallEndedBeforeConnection,
+          });
+      },
+    );
 
     socket.on("call-accepted", ({ answer, from }) => {
-      console.log(answer, from);
+      console.log("answer", answer, from);
       socket.to(socketMapID[from]).emit("call-accepted", { answer, from });
     });
 
     socket.on("ice-candidate", ({ candidate, to, from }) => {
-      console.log("this is candidate", from, candidate);
-      io.to(socketMapID[to]).emit("ice-candidate", { candidate });
+      console.log("Candidate received on server from:", from, "to:", to);
+
+      const targetSocketId = socketMapID[to];
+
+      if (targetSocketId) {
+        // ✅ io.to use karein specific socket ID ko emit karne ke liye
+        io.to(targetSocketId).emit("ice-candidate", { candidate, from });
+        console.log(
+          `Candidate forwarded successfully to ${to} (${targetSocketId})`,
+        );
+      } else {
+        console.error(
+          `User ${to} is not online or socket ID missing in socketMapID!`,
+        );
+      }
     });
 
     console.log(socket.id);

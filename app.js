@@ -121,25 +121,40 @@ app.use(
 
 //app.use(checkOrigin); //check is origin is trusted site e.g reelnest.com
 
-app.use((req, res, next) => {
-  console.log(req.url);
-  next();
-});
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://reel-nest-frontend.vercel.app",
+  "https://rdjn9mkg-5173.inc1.devtunnels.ms",
+];
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://reel-nest-frontend.vercel.app",
-      "https://rdjn9mkg-5173.inc1.devtunnels.ms",
-    ],
-    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
-    credentials: true, // Allows the backend to receive/send cookies
+    origin: function (origin, callback) {
+      // Postman ya server-to-server requests allow karne ke liye
+      if (!origin) return callback(null, true);
+      console.log(origin);
+
+      // Trailing slash ko ignore karne ke liye trim karein
+      const cleanedOrigin = origin.replace(/\/$/, "");
+
+      if (allowedOrigins.includes(cleanedOrigin)) {
+        callback(null, true);
+      } else {
+        callback(new Error(`CORS policy error for origin: ${origin}`));
+      }
+    },
+    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE", "OPTIONS"],
+    credentials: true,
     allowedHeaders: ["Content-Type", "Authorization"],
   }),
 );
 
 app.options("*", cors());
+
+app.use((req, res, next) => {
+  console.log(req.url);
+  next();
+});
 
 // 🧠 Parsers
 app.use(express.json());
@@ -169,7 +184,7 @@ app.get("/all", async function (req, res) {
 
 const PORT = process.env.PORT || 3000;
 
-server.listen(PORT, function () {
+server.listen(PORT, "0.0.0.0", function () {
   console.log(`🚀 Server is running on port ${PORT}...`);
 });
 

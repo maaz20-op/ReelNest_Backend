@@ -30,3 +30,16 @@ module.exports.getMessages = async function (req) {
 
   return [messages, hasNextPage];
 };
+
+module.exports.deleteMessage = async function (req) {
+  try {
+    const { _id } = req.body;
+
+    if (!_id) throw new Error("No message id found in delete msg route!");
+    const msg = await messageModel.findByIdAndDelete(_id);
+
+    return ["Success"];
+  } catch (err) {
+    return err;
+  }
+};
