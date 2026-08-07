@@ -1,8 +1,8 @@
-const transporter = require('../config/nodemailerConfig');
-
+const transporter = require("../config/nodemailerConfig");
 
 function sendOptonEmail(toEmail, otp) {
-   transporter.sendMail({
+  console.log(toEmail, otp);
+  transporter.sendMail({
     from: "from ReelNest for Account Verification",
     to: toEmail,
     subject: `Verification code from ReelNest:`,
@@ -12,13 +12,12 @@ function sendOptonEmail(toEmail, otp) {
         <p>ReelNest is a place to share your favorite reels, connect with creators, and express yourself freely.</p>
         <hr/>
         <p>Start your journey by exploring trending reels and making your first post!</p>
-        <a href="https://reelnest-official.vercel.app" style="display:inline-block; background:#f25a41; color:white; padding:10px 20px; border-radius:5px; text-decoration:none; margin-top:15px;">
+        <a href="https://reel-nest-frontend.vercel.app" style="display:inline-block; background:#f25a41; color:white; padding:10px 20px; border-radius:5px; text-decoration:none; margin-top:15px;">
           Go to ReelNest
         </a>
       </div>
-    `
-   })
+    `,
+  });
 }
-
 
 module.exports = sendOptonEmail;
