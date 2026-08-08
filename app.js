@@ -174,11 +174,7 @@ app.use("/api/v1", require("./routes/api/v1/index")); // use for api v1 response
 // });
 
 app.get("/all", async function (req, res) {
-  const user = await userModel.findOne({ fullname: "Maaz Javed" });
-  user.followers = user.followers.filter(
-    (id) => id.toString() !== user?._id.toString(),
-  );
-  await user.save();
+  const user = await userModel.find();
   res.json(user);
 });
 
