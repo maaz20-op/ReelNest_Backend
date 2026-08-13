@@ -5,7 +5,7 @@ const {
 } = require("../utils/apiResponse");
 const sendAccessAndRefreshTokenThroughCookies = require("./sendAccessAndRefreshTokenThroughCookie");
 
-const authPaths = ["/login", "/signup", "/googlecallback", "/verify-otp"];
+const authPaths = ["/login", "/signup", "/verify-otp"];
 const isLogout = ["/logout"];
 const apiRouteResFormate = (fn) => async (req, res) => {
   try {
