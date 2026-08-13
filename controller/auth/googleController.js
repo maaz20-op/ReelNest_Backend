@@ -7,14 +7,36 @@ const sendAccessAndRefreshTokenThroughCookies = require("../../utils/sendAccessA
 module.exports.googleCallback = async (req, res) => {
   try {
     let userEmail = req.user;
-    console.log("REUESTED USRR", userEmail);
-    if (!userEmail) throw new Error("Google LogedIn failed!");
+    console.log("REQUESTED USER:", userEmail);
+
+    if (!userEmail) {
+      console.log("❌ Google Login Failed: req.user missing");
+      return res.redirect("https://reel-nest-frontend.vercel.app/login");
+    }
+
     let user = await userModel.findOne({ email: userEmail });
-    if (!user) throw new Error("Failed to Login");
-    sendAccessAndRefreshTokenThroughCookies(user?.email, res);
-    res.redirect(`https://reel-nest-frontend.vercel.app?user=${user}`);
+
+    if (!user) {
+      console.log("❌ Failed to Login: User not in database");
+      return res.redirect("https://reel-nest-frontend.vercel.app/login");
+    }
+
+    sendAccessAndRefreshTokenThroughCookies(user.email, res);
+
+    const userString = encodeURIComponent(JSON.stringify(user));
+
+    return res.redirect(
+      `https://reel-nest-frontend.vercel.app/google-callback?user=${userString}`,
+    );
   } catch (err) {
-    res.redirect("https://reel-nest-frontend.vercel.app/login");
+    console.error("❌ Catch Error in Google Callback:", err.message);
+
+    if (res.headersSent) {
+      console.log("Response already completed. Preventing duplicate redirect.");
+      return;
+    }
+
+    return res.redirect("https://reel-nest-frontend.vercel.app/login");
   }
 };
 
