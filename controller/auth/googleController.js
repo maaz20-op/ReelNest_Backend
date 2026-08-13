@@ -12,7 +12,7 @@ module.exports.googleCallback = async (req, res) => {
     let user = await userModel.findOne({ email: userEmail });
     if (!user) throw new Error("Failed to Login");
     sendAccessAndRefreshTokenThroughCookies(user?.email, res);
-    res.redirect("https://reel-nest-frontend.vercel.app");
+    res.redirect(`https://reel-nest-frontend.vercel.app?user=${user}`);
   } catch (err) {
     res.redirect("https://reel-nest-frontend.vercel.app/login");
   }
