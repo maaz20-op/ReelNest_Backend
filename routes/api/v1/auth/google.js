@@ -25,7 +25,7 @@ router.get(
     failureRedirect: "https://reel-nest-frontend.vercel.app/login",
     session: false,
   }),
-  apiRouteResFormate(googleCallback),
+  googleCallback,
 );
 
 module.exports = router;
