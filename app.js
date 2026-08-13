@@ -125,6 +125,7 @@ const allowedOrigins = [
   "http://localhost:5173",
   "https://reel-nest-frontend.vercel.app",
   "https://rdjn9mkg-5173.inc1.devtunnels.ms",
+  "https://neuron-pavilion-reappoint.ngrok-free.dev",
 ];
 
 app.use(
