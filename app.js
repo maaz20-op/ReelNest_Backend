@@ -128,7 +128,6 @@ const allowedOrigins = [
   "https://neuron-pavilion-reappoint.ngrok-free.dev",
 ];
 
-// Add this right before your parsers (app.use(express.json()))
 app.set("trust proxy", 1);
 
 app.use(
