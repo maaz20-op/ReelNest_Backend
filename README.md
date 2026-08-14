@@ -251,11 +251,57 @@ git clone https://github.com/maaz20-op/ReelNest_Backend.git
 npm install
 ```
 
+---
+
+## 🔐 Environment Variables
+
+ReelNest Backend requires environment variables for authentication, database access,
+third-party services, email delivery, payments, and server configuration.
+
+Create a `.env` file in the root directory of the backend:
+
+```env
+# Authentication
+ACCESS_TOKEN_SECRET=YOUR_ACCESS_TOKEN_SECRET
+REFRESH_TOKEN_SECRET=YOUR_REFRESH_TOKEN_SECRET
+EXPRESS_SESSION_SECRET=YOUR_EXPRESS_SESSION_SECRET
+
+# Database
+MONGO_URI=YOUR_MONGODB_CONNECTION_STRING
+
+# Server
+PORT=3000
+
+# Cloudinary
+CLOUDINARY_CLOUD_NAME=YOUR_CLOUDINARY_CLOUD_NAME
+CLOUDINARY_API_KEY=YOUR_CLOUDINARY_API_KEY
+CLOUDINARY_API_SECRET=YOUR_CLOUDINARY_API_SECRET
+
+# Stripe
+STRIPE_SECRET_KEY=YOUR_STRIPE_SECRET_KEY
+
+# Hugging Face
+HUGGING_FACE_API_KEY=YOUR_HUGGING_FACE_API_KEY
+
+# Google OAuth
+GOOGLE_CLIENT_ID=YOUR_GOOGLE_CLIENT_ID
+GOOGLE_CLIENT_SECRET=YOUR_GOOGLE_CLIENT_SECRET
+
+# Email / Nodemailer
+EMAIL_USER=YOUR_EMAIL_ADDRESS
+EMAIL_PASS=YOUR_EMAIL_APP_PASSWORD
+
+```
+
+---
+
 ### 3. Start the Development Server
 
 ```bash
 npm run dev
 ```
+
+---
 
 ## 👨‍💻 Author
 
