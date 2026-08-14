@@ -2,6 +2,7 @@ const jwt = require("jsonwebtoken");
 const userModel = require("../models/user-model");
 const apiRouteResFormate = require("../utils/ApiRoute");
 const sendAccessAndRefreshTokenThroughCookies = require("../utils/sendAccessAndRefreshTokenThroughCookie");
+const { v4: uuidv4 } = require("uuid");
 
 const isLoggedIn = async function (req, res, next) {
   try {
@@ -9,8 +10,16 @@ const isLoggedIn = async function (req, res, next) {
     let jwtRefreshToken = req.cookies.refreshToken;
 
     if (!jwtRefreshToken)
-      return apiRouteResFormate(() => {
-        return [];
+      return res.status(404).json({
+        success: false,
+        statusCode: 404,
+        message: "Not Authorized User!",
+        error: "Error",
+        meta: {
+          requestId: uuidv4(),
+          timestamp: new Date().toISOString(),
+          apiVersion: "v1",
+        },
       });
 
     let refreshTokenData = jwt.verify(
