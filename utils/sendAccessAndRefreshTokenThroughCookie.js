@@ -5,10 +5,7 @@ function sendAccessAndRefreshTokenThroughCookies(userEmail, res) {
   const accessToken = generateAccessToken(userEmail);
   const refreshToken = generateRefreshToken(userEmail);
 
-  console.log("trhis my access torekn", accessToken);
-  console.log("trhis my refresh torekn", refreshToken);
-
-  // Check if we are running in production on Vercel
+  // Check if we are running in production on Vercel/Railway
   const isProduction = process.env.NODE_ENV === "production";
 
   res.setHeader("Set-Cookie", [

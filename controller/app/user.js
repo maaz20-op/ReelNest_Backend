@@ -26,7 +26,7 @@ module.exports.updateAccountSettings = async function (req) {
   try {
     let dbuser = await userModel.findById(req.user?._id);
     let updatedData = {};
-    console.log(req.body);
+
     for (let key in req.body) {
       const newValue = req.body[key];
       const oldValue = dbuser[key];
@@ -43,8 +43,7 @@ module.exports.updateAccountSettings = async function (req) {
       updatedData,
       { new: true },
     );
-    console.log(updatedUser);
-    console.log(updatedUser.accountVisibility);
+
     return [updatedUser];
   } catch (err) {
     throw err;
@@ -91,7 +90,7 @@ module.exports.getBlockedUser = async function (req) {
     const user = await userModel
       .findById(req.user?._id)
       .populate("blockedUserId", "fullname _id profileImage username");
-    console.log("hihhi", user.blockedUserId);
+
     return [user?.blockedUserId];
   } catch (err) {
     throw err;
@@ -141,7 +140,7 @@ module.exports.deleteAccount = async function (req) {
 module.exports.followOtherUser = async function (req) {
   try {
     let followedUser = await userModel.findById(req.body.id);
-    console.log(req.body);
+
     let loggedInUser = await userModel.findById(req.user?._id);
 
     if (
@@ -163,7 +162,7 @@ module.exports.followOtherUser = async function (req) {
     let followingCount = followedUser.following.length;
 
     let followersCount = followedUser.followers.length;
-    console.log("user followed successfully");
+
     return [followingCount, followersCount];
   } catch (err) {
     throw err;
@@ -176,7 +175,6 @@ module.exports.unfollowOtherUser = async function (req) {
     let user = await userModel.findById(req.user?._id);
 
     let followingUser = await userModel.findById(req.body.id);
-    console.log(followingUser);
 
     if (!followingUser || !user) {
       throw new Error("No user Found");
@@ -193,7 +191,7 @@ module.exports.unfollowOtherUser = async function (req) {
     });
 
     await Promise.all([followingUser.save(), user.save()]);
-    console.log("follow user found");
+
     return [followingUser];
   } catch (err) {
     throw err;
@@ -301,7 +299,6 @@ module.exports.getUserConnectionsById = async function (req) {
       })
       .select("fullname username _id profileImage");
 
-    console.log(friends.length, userfollowers.length, userfollowing.length);
     return [userfollowers, userfollowing, friends];
   } catch (err) {
     return null;
@@ -408,7 +405,6 @@ module.exports.getLoggedInUserConnections = async function (req) {
       })
       .select("fullname username _id profileImage");
 
-    console.log(friends.length, userfollowers.length, userfollowing.length);
     return [userfollowers, userfollowing, friends];
   } catch (err) {
     return null;

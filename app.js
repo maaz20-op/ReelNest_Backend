@@ -2,7 +2,7 @@ const envFile = `.env.${process.env.NODE_ENV || "development"}`;
 let dotenv = require("dotenv");
 dotenv.config();
 const mongoose = require("mongoose");
-console.log(process.env.MONGO_URI);
+
 mongoose
   .connect(process.env.MONGO_URI)
   .then(() => console.log("✅ MongoDB Connected"))
@@ -177,7 +177,20 @@ app.use("/api/v1", require("./routes/api/v1/index")); // use for api v1 response
 // });
 
 app.get("/all", async function (req, res) {
-  const user = await userModel.find();
+  const user = await postModel.find();
+  // const user = await userModel.deleteMany({
+  //   _id: {
+  //     $in: [
+  //       "6a7f54ec3ff459ff39f41c70",
+  //       "6a70988ce48d62cbbfa5c3b8",
+  //       "6a529cac22cc31a60a0a86c0",
+  //       "6a76560e8ab3dee7a15af1c8",
+  //       "6a5a258fdfb21329b3145f46",
+  //       "6a70d5e2e48d62cbbfa5c895",
+  //     ],
+  //   },
+  // });
+
   res.json(user);
 });
 

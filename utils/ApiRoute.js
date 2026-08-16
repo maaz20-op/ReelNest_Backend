@@ -14,11 +14,10 @@ const apiRouteResFormate = (fn) => async (req, res) => {
       ApiResponseError(res, "Server Error!", "Error", 304);
       return;
     }
-    console.log("this url", req.url);
+
     if (authPaths.includes(req.url) && data[0]?.email) {
       sendAccessAndRefreshTokenThroughCookies(data[0].email, res);
     } else if (isLogout.includes(req.url)) {
-      console.log("logout reached");
       res.clearCookie("accessToken");
       res.clearCookie("refreshToken");
     }

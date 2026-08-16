@@ -50,7 +50,7 @@ const isLoggedIn = async function (req, res, next) {
       email: accessTokenData.email,
     });
 
-    if (!user) return console.log("no user 2");
+    if (!user) return console.log("No user found in Middleware!");
 
     req.user = {
       _id: user._id,

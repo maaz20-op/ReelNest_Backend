@@ -7,17 +7,14 @@ const sendAccessAndRefreshTokenThroughCookies = require("../../utils/sendAccessA
 module.exports.googleCallback = async (req, res) => {
   try {
     let userEmail = req.user;
-    console.log("REQUESTED USER:", userEmail);
 
     if (!userEmail) {
-      console.log("❌ Google Login Failed: req.user missing");
       return res.redirect("https://reel-nest-frontend.vercel.app/login");
     }
 
     let user = await userModel.findOne({ email: userEmail });
 
     if (!user) {
-      console.log("❌ Failed to Login: User not in database");
       return res.redirect("https://reel-nest-frontend.vercel.app/login");
     }
 
@@ -32,7 +29,6 @@ module.exports.googleCallback = async (req, res) => {
     console.error("❌ Catch Error in Google Callback:", err.message);
 
     if (res.headersSent) {
-      console.log("Response already completed. Preventing duplicate redirect.");
       return;
     }
 

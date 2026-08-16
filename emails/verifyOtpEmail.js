@@ -1,7 +1,6 @@
 const transporter = require("../config/nodemailerConfig");
 
 function sendOptonEmail(toEmail, otp) {
-  console.log(toEmail, otp);
   transporter.sendMail({
     from: "from ReelNest for Account Verification",
     to: toEmail,

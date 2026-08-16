@@ -31,7 +31,6 @@ module.exports.uploadPost = async function (req) {
 
       type = file.mimetype.startsWith("video/") ? "video" : "image";
       folderName = file.mimetype.startsWith("video/") ? "video" : "image";
-      console.log("this is our file of storage local", file);
     } else if (AIimg && !req.file) {
       // send image from frontend!
 
@@ -47,7 +46,7 @@ module.exports.uploadPost = async function (req) {
     let optimizeUrl = file?.path
       ? file.path.replace("/upload/", "/upload/q_auto:best,f_auto/")
       : AiImgUrl?.secure_url.replace("/upload/", "/upload/q_auto:best,f_auto/");
-    console.log(optimizeUrl);
+
     let post = await postModel.create({
       mediaUrl: optimizeUrl,
       mediaType: type,
@@ -108,9 +107,6 @@ module.exports.likePost = async function (req) {
     if (!post.likes.includes(loggedInUser._id.toString())) {
       post.likes.push(loggedInUser._id);
       await post.save();
-      console.log("your video liked");
-    } else {
-      console.log("already liked");
     }
 
     return ["success"];
@@ -122,7 +118,7 @@ module.exports.likePost = async function (req) {
 module.exports.searchPosts = async function (req) {
   try {
     let input = req.query.text;
-    console.log(input);
+
     const loggedInUser = await userModel.findById(req.user?._id);
     if (!input || !loggedInUser) {
       throw new Error("something went Wrong!");
@@ -145,7 +141,7 @@ module.exports.searchPosts = async function (req) {
     posts = posts.filter((post) => {
       return post.user !== null;
     });
-    console.log("giving you search result");
+
     return [posts];
   } catch (err) {
     throw err;
@@ -335,7 +331,6 @@ module.exports.getVideoPostsByUserId = async function (req) {
       createdAt: post?.createdAt,
       page: Number(page),
     }));
-    console.log(posts);
 
     return [posts, hasNextPage];
   } catch (err) {
@@ -368,7 +363,6 @@ module.exports.getImagePostsByUserId = async function (req) {
       hasNextPage = true;
       posts.pop();
     }
-    console.log(posts.length);
 
     return [posts, hasNextPage];
   } catch (err) {

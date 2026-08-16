@@ -32,8 +32,6 @@ module.exports.savePin = async function (req) {
       createdBy: user._id,
     });
 
-    console.log("this is pin", pin);
-
     user.pins.push(pin._id);
     await user.save();
     let array = [pin];
@@ -57,7 +55,7 @@ module.exports.deletePin = async function (req) {
       { _id: req.user._id },
       { $pull: { pins: deletedPin._id } },
     );
-    console.log("deleted saved post");
+
     return ["success"];
   } catch (err) {
     throw err;
@@ -120,7 +118,6 @@ module.exports.getSavedVideoPosts = async function (req) {
       hasNextPage = true;
       pins.pop();
     }
-    console.log(pins.length);
 
     pins.reverse();
 
@@ -186,7 +183,6 @@ module.exports.getSavedImagePosts = async function (req) {
       hasNextPage = true;
       pins.pop();
     }
-    console.log(pins.length);
 
     pins.reverse();
 

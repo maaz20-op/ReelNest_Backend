@@ -5,7 +5,7 @@ const mongoose = require("mongoose");
 module.exports.createComment = async function (req) {
   let input = req.body.inputText;
   let id = req.body.postId;
-  console.log("yeeh", input, id);
+
   if (!input || !id) throw new Error("Invalid data Cant perform operation");
   try {
     let post = await postModel.findById(id);
@@ -22,7 +22,7 @@ module.exports.createComment = async function (req) {
     loggedInUser.userCommented.push(comment._id);
 
     await Promise.all([post.save(), loggedInUser.save()]);
-    console.log("comment pushed");
+
     return [comment, loggedInUser];
   } catch (err) {
     throw err;
@@ -31,7 +31,6 @@ module.exports.createComment = async function (req) {
 
 module.exports.showAllComments = async function (req) {
   let { postId: id, limit, page } = req.query;
-  console.log("show all comments id post", id);
 
   // Parse and normalize numbers with fallbacks
   const limitNum = Number(limit) || 20;
@@ -64,8 +63,6 @@ module.exports.showAllComments = async function (req) {
         },
       },
     ]);
-
-    console.log(comments.length);
 
     let nextPage = false;
     if (comments.length > limit) {

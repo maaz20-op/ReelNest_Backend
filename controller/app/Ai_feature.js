@@ -41,7 +41,6 @@ module.exports.generateAiImage = async function (req) {
         console.log(`15 mins poore ho gaye! Deleting: ${publicIdToDelete}`);
         // Yeh line sirf is specific image ko Cloudinary se delete karegi
         await cloudinary.uploader.destroy(publicIdToDelete);
-        console.log("image deleted");
       } catch (deleteErr) {
         console.error("Auto-delete failed for:", publicIdToDelete, deleteErr);
       }
@@ -58,7 +57,7 @@ module.exports.deleteAiImgFromCloudinary = async function (req) {
     let { generatedImage } = req.body;
     if (!generatedImage) throw new Error("Cant Delete Image from cloudinary");
     let res = await deleteimgFromCloudinary(generatedImage, "image");
-    console.log("ai image deleted  $$$$", res);
+
     return ["successfully deleled image"];
   } catch (err) {
     throw err;

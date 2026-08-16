@@ -7,11 +7,11 @@ const sendAccessAndRefreshTokenThroughCookies = require("../../utils/sendAccessA
 const generateOTP = require("../../utils/generateOTP");
 const { addLoginEmailToQueue } = require("../../queues/emailQueue");
 const validateLoginRequest = require("../../utils/noSQLPreventionTechniques");
+const ApiError = require("../../utils/apiError");
 
 // local authentication using email and password
 module.exports.signupUser = async function (req) {
   try {
-    console.log(req.body);
     let { fullname, username, email, password } = req.body;
 
     if (!fullname || !username || !email || !password) {
@@ -46,6 +46,8 @@ module.exports.signupUser = async function (req) {
     });
 
     // email send will be control by userWatcher (change streams) in Mongo DB
+    if (!createdUser) throw ApiError(505, "Failed to Signup, Server Error!");
+    sendSignupEmail(createdUser?.email);
 
     return [createdUser];
   } catch (err) {
@@ -62,7 +64,6 @@ module.exports.loginUser = async function (req) {
     if (error) {
       throw new Error(`${error?.details[0]?.message || "Invalid Details!"}`);
     }
-    console.log("val9idation librerat", value, error);
 
     let { email, password } = req.body;
 
@@ -111,7 +112,7 @@ module.exports.sendOTP = async function (req, res) {
     let otp = generateOTP();
     req.session.otp = otp;
     req.session.email = verificationEmail;
-    console.log("session otp", req.session.otp, req.session.email);
+
     sendOptonEmail(verificationEmail, req.session.otp);
     if (!req.session.email && !req.session.otp) {
       throw new Error("something went wrong!");
@@ -128,7 +129,7 @@ module.exports.verifyOtp = async function (req) {
     let emailOTP = req.session.otp;
     let verificationEmail = req.session?.email;
     let userInputOPT = otp.toString();
-    console.log(emailOTP, userInputOPT);
+
     if (emailOTP.toString() !== userInputOPT.toString())
       throw new Error("wrong OTP code");
 
@@ -142,7 +143,7 @@ module.exports.verifyOtp = async function (req) {
     // delete email and otp from session
     delete req.session.otp;
     delete req.session.email;
-    console.log("session after delete", req.session.otp, req.session.email);
+
     return [user];
   } catch (err) {
     return err;
