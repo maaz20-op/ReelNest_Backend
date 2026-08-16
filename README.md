@@ -8,6 +8,17 @@ The backend is responsible for features including **posts, reels, likes, comment
 
 ---
 
+### 🌐  ReelNest Preview Video
+
+https://github.com/user-attachments/assets/f821d1ce-6000-4752-94f3-d845b53de067
+
+
+
+
+
+
+
+
 ### 🌐 Live ReelNest Demo
 
 **ReelNest Frontend**
