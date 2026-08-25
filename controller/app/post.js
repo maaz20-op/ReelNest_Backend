@@ -47,17 +47,18 @@ module.exports.uploadPost = async function (req) {
       ? file.path.replace("/upload/", "/upload/q_auto:best,f_auto/")
       : AiImgUrl?.secure_url.replace("/upload/", "/upload/q_auto:best,f_auto/");
 
-    let post = await postModel.create({
-      mediaUrl: optimizeUrl,
-      mediaType: type,
-      user: user._id,
-      postdata: req.body.title,
-    });
+    // let post = await postModel.create({
+    //   mediaUrl: optimizeUrl,
+    //   mediaType: type,
+    //   user: user._id,
+    //   postdata: req.body.title,
+    // });
 
-    user.post.push(post._id);
-    await user.save();
+    // user.post.push(post._id);
+    // await user.save();
+    console.log(optimizeUrl, file);
 
-    return [post, user];
+    return ["success", user];
   } catch (err) {
     throw err;
   }

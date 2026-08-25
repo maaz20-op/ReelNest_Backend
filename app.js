@@ -27,6 +27,7 @@ const io = new Server(server, {
   cors: {
     origin: [
       "http://localhost:5173",
+      " http://localhost:5174",
       "https://reel-nest-frontend.vercel.app",
       "https://rdjn9mkg-5173.inc1.devtunnels.ms",
     ],
@@ -123,6 +124,7 @@ app.use(
 
 const allowedOrigins = [
   "http://localhost:5173",
+  " http://localhost:5174",
   "https://reel-nest-frontend.vercel.app",
   "https://rdjn9mkg-5173.inc1.devtunnels.ms",
   "https://neuron-pavilion-reappoint.ngrok-free.dev",
